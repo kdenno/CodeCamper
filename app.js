@@ -11,11 +11,14 @@ dotenv.config({ path: path.join(__dirname, "config", "config.env") });
 // connect to database
 connectDB();
 
+
 const PORT = process.env.PORT || 3000;
 const app = express();
+// Body parser
+app.use(express.json());
 app.use("/api/v1/bootcamps", APIroutes);
 if (process.env.NODE_ENV === "development") {
-  app.use(morgan(dev));
+  app.use(morgan());
 }
 
 const server = app.listen(PORT, () => {
