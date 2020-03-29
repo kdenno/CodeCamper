@@ -1,6 +1,6 @@
 const express = require("express");
 const routes = express.Router();
-const apicontroller = require("../controllers/apicontrollers");
+const apicontroller = require("../controllers/bootcampcontrollers");
 
 routes.get("/", apicontroller.bootcamps);
 routes.post("/", apicontroller.createbootcamp);

@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const path = require("path");
 const APIroutes = require("./routes/APIroutes");
 const morgan = require("morgan");
+const colors = require("colors");
 const connectDB = require("./config/db");
 
 // load env variables
@@ -20,12 +21,13 @@ if (process.env.NODE_ENV === "development") {
 const server = app.listen(PORT, () => {
   console.log(
     `Server running on in ${process.env.NODE_ENV} at port ${process.env.PORT}`
+      .yellow.bold
   );
 });
 
 // handle unhandled promise rejections
 process.on("unhandledRejection", (err, promise) => {
-  console.log(`Error ${err.message}`);
+  console.log(`Error ${err.message}`.red.underline);
   // close server and exit
   server.close(() => process.exit(1));
 });
