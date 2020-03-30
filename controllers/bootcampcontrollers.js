@@ -1,4 +1,5 @@
 const Bootcamp = require("../models/Bootcamp");
+const ErrorMessage = require("../util/ErrorMessage");
 
 exports.bootcamps = async (req, res, next) => {
   try {
@@ -21,13 +22,13 @@ exports.getbootcamp = async (req, res, next) => {
   try {
     const bootcamp = await Bootcamp.findById(req.params.Id);
     if (!bootcamp) {
-      return res
-        .status(400)
-        .json({ success: false, message: "No bootcamp found" });
+      return  next(new ErrorMessage(`Bootcamp with ID ${req.params.Id} doesnot exist`, 400));
     }
     res.status(200).json({ success: true, data: bootcamp });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    // res.status(400).json({ success: false, message: error.message });
+    // push error to the middleware
+    next(new ErrorMessage(`Bootcamp with ID ${req.params.Id} doesnot exist`, 400));
   }
 };
 exports.Updatebootcamp = async (req, res, next) => {

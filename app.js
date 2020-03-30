@@ -4,13 +4,13 @@ const path = require("path");
 const APIroutes = require("./routes/APIroutes");
 const morgan = require("morgan");
 const colors = require("colors");
+const errorHandler = require("./middleware/error");
 const connectDB = require("./config/db");
 
 // load env variables
 dotenv.config({ path: path.join(__dirname, "config", "config.env") });
 // connect to database
 connectDB();
-
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -20,6 +20,7 @@ app.use("/api/v1/bootcamps", APIroutes);
 if (process.env.NODE_ENV === "development") {
   app.use(morgan());
 }
+app.use(errorHandler);
 
 const server = app.listen(PORT, () => {
   console.log(
