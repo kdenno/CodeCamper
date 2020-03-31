@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-const slugify = require("slugify"); 
+const slugify = require("slugify");
+const geoCoder = require("../util/geocoder");
 const bootcampSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -50,10 +51,9 @@ const bootcampSchema = new mongoose.Schema({
     },
     formattedAddress: String,
     street: String,
-    zipcode: String,
-    country: String,
-    city: String,
-    state: String
+    zipcode: { type: String, default: "00256" },
+    country: { type: String, default: "Uganda" },
+    city: { type: String, default: "Kampala" }
   },
   careers: {
     type: [String],
@@ -99,9 +99,26 @@ const bootcampSchema = new mongoose.Schema({
   }
 });
 // create Bootcamp slug before save is triggered
-bootcampSchema.pre('save', function(next){
+bootcampSchema.pre("save", function(next) {
   // in here we have access to all the fields
-  this.slug = slugify(this.name, {lowercase: true});
+  this.slug = slugify(this.name, { lowercase: true });
+  next();
+});
+
+// create middleware to get location
+bootcampSchema.pre("save", async function(next) {
+  const loc = await geoCoder.geocode(this.address);
+  this.location = {
+    type: "Point",
+    coordinates: [loc[0].latitude, loc[0].longitude],
+    formattedAddress: loc[0].formattedAddress,
+    street: loc[0].streetName,
+    zipcode: loc[0].zipcode,
+    country: loc[0].country,
+    city: loc[0].city
+  };
+  // we already have this location object, dont save address in DB
+  this.address = undefined;
   next();
 });
 module.exports = mongoose.model("Bootcamp", bootcampSchema);
