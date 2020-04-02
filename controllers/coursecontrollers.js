@@ -24,7 +24,7 @@ exports.getCourse = asyncHandler(async (req, res, next)=> {
     }
     const course =  await Course.findById(req.params.Id).populate({ path: 'bootcamp', select: 'name description'});
     if(!course){
-        next(new ErrorMessage(`Course with ID ${req.params.Id} was not found`, 400));
+        next(new ErrorMessage(`Course with ID ${req.params.Id} was not found`, 404));
        
     }
     res.status(200).json({ success: true, data: course });
@@ -41,7 +41,7 @@ exports.addCourse = asyncHandler(async (req, res, next)=> {
    req.body.bootcamp = req.params.bootcampId;
     const bootcamp =  await Bootcamp.findById(req.params.bootcampId);
     if(!bootcamp){
-        next(new ErrorMessage(`Bootcamp with ID ${req.params.bootcampId} was not found`, 400));
+        next(new ErrorMessage(`Bootcamp with ID ${req.params.bootcampId} was not found`, 404));
        
     }
     const course = await Course.create(req.body);
@@ -49,3 +49,19 @@ exports.addCourse = asyncHandler(async (req, res, next)=> {
 
 
 });
+
+// @desc Add Course
+// @route POST /api/v1/bootcamps/:bootcampId/course--course is associated with a bootcamp
+// @access Private
+
+exports.updateCourse = asyncHandler(async (req, res, next)=> {
+   
+     let course =  await Course.findById(req.params.Id);
+     if(!course){
+         next(new ErrorMessage(`Course with ID ${req.params.Id} was not found`, 404));  
+     }
+     course = await Course.findByIdAndUpdate(req.params.Id, req.body, { new: true, runValidators: true});
+     res.status(201).json({ success: true, data: course });
+ 
+ 
+ });
