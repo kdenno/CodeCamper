@@ -1,7 +1,8 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const path = require("path");
-const APIroutes = require("./routes/APIroutes");
+const Bootcamproutes = require("./routes/Bootcamp");
+const Courseroutes = require("./routes/Courseroutes");
 const morgan = require("morgan");
 const colors = require("colors");
 const errorHandler = require("./middleware/error");
@@ -16,7 +17,8 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 // Body parser
 app.use(express.json());
-app.use("/api/v1/bootcamps", APIroutes);
+app.use("/api/v1/bootcamps", Bootcamproutes);
+app.use("/api/v1/courses", Courseroutes);
 if (process.env.NODE_ENV === "development") {
   app.use(morgan());
 }
