@@ -4,7 +4,33 @@ const asyncHandler = require("../middleware/asyncHandler");
 const geoCoder = require("../util/geocoder");
 
 exports.bootcamps = asyncHandler(async (req, res, next) => {
-  const bootcamps = await Bootcamp.find();
+  let query;
+  let reqQuery = { ...req.query };
+
+  // fields to exclude
+  const removeFields = ["select", "sort"];
+
+  // remove fields from query
+  removeFields.forEach(param => delete reqQuery[param]);
+
+  // create mongo operators from  req.query averageCost[lte]=10000 to {"averageCost":{"$lte":"10000"},"location.city":"Boston"}
+  const queryString = JSON.stringify(reqQuery).replace(/\b gt|lt|lte|gte|in\b/g,match => `$${match}` );
+  query = Bootcamp.find(JSON.parse(queryString));
+
+  // query with select in it
+  if (req.query.select) {
+    // req.query.select = select=name,description
+    const fields = req.query.select.split(",").join(" ");
+    query = query.select(fields);
+  }
+  // query with sort in it
+  if (req.query.sort) {
+    const sortBy = req.query.sort.split(",").join(" ");
+    query = query.sort(sortBy);
+  } else {
+    query = query.sort("-createdAt");
+  }
+  const bootcamps = await query;
   res
     .status(200)
     .json({ success: true, count: bootcamps.length, data: bootcamps });
@@ -44,7 +70,6 @@ exports.deletebootcamp = asyncHandler(async (req, res, next) => {
 // @params zipcode, distance
 // @route GET /api/v1/bootcamps/radius/:zipcode/:distance
 
-
 exports.findBootcampsWithinRadius = asyncHandler(async (req, res, next) => {
   const { zipcode, distance } = req.params;
   // get lat and lng from geo coder
@@ -56,8 +81,8 @@ exports.findBootcampsWithinRadius = asyncHandler(async (req, res, next) => {
   // raidus of earth 3,963m / 6,378km
   const radius = distance / 3963;
   const bootcamps = await Bootcamp.find({
-    location: {$geoWithin: { $centerSphere: [ [ lat, lng ], radius ] }}
-  }); 
+    location: { $geoWithin: { $centerSphere: [[lat, lng], radius] } }
+  });
 
   res
     .status(200)
