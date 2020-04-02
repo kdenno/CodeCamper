@@ -6,4 +6,5 @@ routes.get("/", courseControllers.getCourses); // handles forwarded route with g
 routes.get("/:Id", courseControllers.getCourse);
 routes.post('/', courseControllers.addCourse); // handles forwarded route with post /:bootcampId/courses
 routes.put('/:Id', courseControllers.updateCourse);
+routes.delete('/:Id', courseControllers.deleteCourse);
 module.exports = routes;

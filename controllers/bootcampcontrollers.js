@@ -90,7 +90,7 @@ exports.deletebootcamp = asyncHandler(async (req, res, next) => {
   if (!bootcamp) {
     return next(new Error());
   }
-  bootcamp.remove(); // this remove method will trigger the pre remove middleware
+  bootcamp.remove({_id: req.params.Id}); // this remove method will trigger the pre remove middleware
   
   res.status(200).json({ success: true, data: {} });
 });

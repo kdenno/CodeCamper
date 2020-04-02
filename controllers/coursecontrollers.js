@@ -50,8 +50,8 @@ exports.addCourse = asyncHandler(async (req, res, next)=> {
 
 });
 
-// @desc Add Course
-// @route POST /api/v1/bootcamps/:bootcampId/course--course is associated with a bootcamp
+// @desc Update Course
+// @route PUT /api/v1/courses/:Id/
 // @access Private
 
 exports.updateCourse = asyncHandler(async (req, res, next)=> {
@@ -65,3 +65,19 @@ exports.updateCourse = asyncHandler(async (req, res, next)=> {
  
  
  });
+
+ // @desc Delete Course
+// @route Delete /api/v1/courses/:Id/
+// @access Private
+
+exports.deleteCourse = asyncHandler(async (req, res, next)=> {
+   
+    const course =  await Course.findById(req.params.Id);
+    if(!course){
+        next(new ErrorMessage(`Course with ID ${req.params.Id} was not found`, 404));  
+    }
+    await Course.remove({_id: req.params.Id});
+    res.status(201).json({ success: true, data: {} });
+
+
+});
