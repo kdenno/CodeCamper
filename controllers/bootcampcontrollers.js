@@ -15,7 +15,8 @@ exports.bootcamps = asyncHandler(async (req, res, next) => {
 
   // create mongo operators from  req.query averageCost[lte]=10000 to {"averageCost":{"$lte":"10000"},"location.city":"Boston"}
   const queryString = JSON.stringify(reqQuery).replace(/\b gt|lt|lte|gte|in\b/g,match => `$${match}` );
-  query = Bootcamp.find(JSON.parse(queryString));
+  
+  query = Bootcamp.find(JSON.parse(queryString)).populate('courses');
 
   // query with select in it
   if (req.query.select) {
@@ -85,10 +86,12 @@ exports.Updatebootcamp = asyncHandler(async (req, res, next) => {
 });
 
 exports.deletebootcamp = asyncHandler(async (req, res, next) => {
-  const bootcamp = await Bootcamp.findByIdAndDelete(req.params.Id);
+  const bootcamp = await Bootcamp.findById(req.params.Id);
   if (!bootcamp) {
     return next(new Error());
   }
+  bootcamp.remove(); // this remove method will trigger the pre remove middleware
+  
   res.status(200).json({ success: true, data: {} });
 });
 
