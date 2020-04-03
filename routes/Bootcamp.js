@@ -19,5 +19,6 @@ routes.get(
 );
 routes.put("/:Id", apicontroller.Updatebootcamp);
 routes.delete("/:Id", apicontroller.deletebootcamp);
+routes.put("/:Id/photo", apicontroller.bootcampPhotoUpload);
 
 module.exports = routes;
