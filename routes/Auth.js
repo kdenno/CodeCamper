@@ -5,7 +5,7 @@ const {
   login,
   getLoggedInUser
 } = require("../controllers/authcontrollers");
-const { protect } = require("../middleware/auth");
+const { protect} = require("../middleware/auth");
 
 routes.post("/register", register);
 routes.post("/login", login);
