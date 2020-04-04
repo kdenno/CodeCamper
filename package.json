@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/kdenno/CodeCamper#readme",
   "dependencies": {
-    "bcrypt": "^4.0.1",
+    "bcryptjs": "^2.4.3",
     "colors": "^1.4.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
