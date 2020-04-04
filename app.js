@@ -5,6 +5,7 @@ const Bootcamproutes = require("./routes/Bootcamp");
 const Courseroutes = require("./routes/Courseroutes");
 const morgan = require("morgan");
 const colors = require("colors");
+const cookieParser = require('cookie-parser');
 const errorHandler = require("./middleware/error");
 const connectDB = require("./config/db");
 const fileupload = require("express-fileupload");
@@ -22,6 +23,7 @@ app.use(express.json());
 // set static folder
 app.use(express.static(path.join(__dirname, "public")));
 app.use(fileupload());
+app.use(cookieParser());
 
 app.use("/api/v1/bootcamps", Bootcamproutes);
 app.use("/api/v1/courses", Courseroutes);
