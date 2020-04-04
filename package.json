@@ -18,10 +18,12 @@
   },
   "homepage": "https://github.com/kdenno/CodeCamper#readme",
   "dependencies": {
+    "bcrypt": "^4.0.1",
     "colors": "^1.4.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-fileupload": "^1.1.7-alpha.1",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.6",
     "morgan": "^1.10.0",
     "node-geocoder": "^3.27.0",
