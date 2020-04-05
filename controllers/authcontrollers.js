@@ -105,6 +105,44 @@ exports.UpdatePassword = asyncHandler(async (req, res, next) => {
 sendCookie(user, 200, res)
 });
 
+
+// @desc update user details
+// @route PUT /api/v1/auth/updatedetails
+// @access Private
+
+exports.updateUserDetails = asyncHandler(async (req, res, next) => {
+  const updateFields = {
+    name: req.body.name,
+    email: req.body.email
+  }
+  const user = await User.findByIdAndUpdate(req.user.id, updateFields, {new: true, runValidators: true});
+  res.status(200).json({ success: true, data: user });
+});
+
+// @desc change user password
+// @route PUT /api/v1/auth/changepassword
+// @access Private
+
+exports.changePassword = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id).select('+password');
+  // compare passwords
+  if(! (await user.matchPassword(req.body.currentPassword))) {
+    return next(new ErrorResponse('Password is incorrect', 401));
+  }
+  user.password = req.body.newPassword;
+  await user.save();
+  sendCookie(user, 200, res);
+});
+
+
+
+
+
+
+
+
+
+
 // create cookie, send cookie
 const sendCookie = (userObj, statusCode, res) => {
   // create cookie options
