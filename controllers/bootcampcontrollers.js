@@ -28,21 +28,31 @@ exports.getbootcamp = asyncHandler(async (req, res, next) => {
   }
   res.status(200).json({ success: true, data: bootcamp });
 });
+
+
 exports.Updatebootcamp = asyncHandler(async (req, res, next) => {
-  const bootcamp = await Bootcamp.findByIdAndUpdate(req.params.Id, req.body, {
-    new: true,
-    runValidators: true
-  });
+  let bootcamp = await Bootcamp.findById(req.params.Id)
   if (!bootcamp) {
     return next(new Error());
   }
+  if(bootcamp.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(new ErrorMessage('Not Authorized to update this bootcamp',401));
+  }
+  bootcamp = await Bootcamp.findByIdAndUpdate(req.params.Id, req.body, {
+    new: true,
+    runValidators: true
+  });
   res.status(200).json({ success: true, data: bootcamp });
 });
+
 
 exports.deletebootcamp = asyncHandler(async (req, res, next) => {
   const bootcamp = await Bootcamp.findById(req.params.Id);
   if (!bootcamp) {
     return next(new Error());
+  }
+  if(bootcamp.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(new ErrorMessage('Not Authorized to delete this bootcamp',401));
   }
   bootcamp.remove({_id: req.params.Id}); // this remove method will trigger the pre remove middleware
   
@@ -79,6 +89,9 @@ exports.bootcampPhotoUpload = asyncHandler(async (req, res, next) => {
   const bootcamp = await Bootcamp.findById(req.params.Id);
   if (!bootcamp) {
     return next(new Error());
+  }
+  if(bootcamp.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    return next(new ErrorMessage('Not Authorized to update this bootcamp',401));
   }
   if (!req.files) {
     return next(new ErrorMessage('Please upload a file', 400));
