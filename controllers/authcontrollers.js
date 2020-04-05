@@ -1,6 +1,7 @@
 const ErrorResponse = require("../util/ErrorMessage");
 const User = require("../models/User");
 const asyncHandler = require("../middleware/asyncHandler");
+const EmailSender = require("../util/sendEmail");
 
 // @desc Register user
 // @route POST /api/v1/auth/register
@@ -12,7 +13,7 @@ exports.register = asyncHandler(async (req, res, next) => {
     name,
     email,
     password,
-    role
+    role,
   });
   sendCookie(user, 200, res);
 });
@@ -39,6 +40,52 @@ exports.login = asyncHandler(async (req, res, next) => {
   sendCookie(user, 200, res);
 });
 
+// @desc Get logged in user
+// @route GET /api/v1/auth/me
+// @access Private
+
+exports.getLoggedInUser = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+  res.status(200).json({ success: true, data: user });
+});
+
+// @desc Reset password
+// @route POST /api/v1/auth/reset
+// @access Public
+
+exports.ResetPassword = asyncHandler(async (req, res, next) => {
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    return next(new ErrorResponse("User not found", 400));
+  }
+  // get token
+  const resetToken = user.CreateResetPasswordToken();
+  // persist the data to the database
+  await user.save({ validateBeforeSave: false });
+  // send email logic
+  const resetUrl = `${req.protocol}://${req.hostname}/api/v1/auth/resetpassword/${resetToken}`;
+  const message = `You are receiving this email because you or someone else requested the reset of a password
+  Please make a put request to \n\n ${resetUrl}`;
+
+  try {
+    await EmailSender({
+      email: user.email,
+      subject: 'Password Reset Token',
+      message
+    });
+    res.status(200).json({ success: true, data: 'Email sent' });
+  } catch (error) {
+    console.log(error);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save({validateBeforeSave: false});
+    return next(new ErrorResponse('Failed to send Email',500));
+    
+  }
+
+ 
+});
+
 // create cookie, send cookie
 const sendCookie = (userObj, statusCode, res) => {
   // create cookie options
@@ -46,7 +93,7 @@ const sendCookie = (userObj, statusCode, res) => {
     expire: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
     ),
-    httpOnly: true
+    httpOnly: true,
   };
   if (process.env.NODE_ENV === "production") {
     options.secure = true;
@@ -59,12 +106,3 @@ const sendCookie = (userObj, statusCode, res) => {
     .status(statusCode)
     .json({ success: true, token });
 };
-
-// @desc Get logged in user
-// @route GET /api/v1/auth/me
-// @access Private
-
-exports.getLoggedInUser = asyncHandler(async(req, res, next) => {
-  const user = await User.findById(req.user.id);
-  res.status(200).json({ success: true, data: user });
-});
