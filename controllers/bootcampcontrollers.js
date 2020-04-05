@@ -9,6 +9,14 @@ exports.bootcamps = asyncHandler(async (req, res, next) => {
   res.status(200).json(res.advancedResults);
 });
 exports.createbootcamp = asyncHandler(async (req, res, next) => {
+  // add user to req.body
+  req.body.user = req.user.id;
+  // make user only creates one bootcamp unless they are admin
+  const publishedbootcamp = await Bootcamp.findOne({user: req.user.id});
+  if(publishedbootcamp && req.user.role !== 'admin') {
+    return next(new ErrorMessage(`User with Id ${req.user.id} has already published a bootcamp`, 400));
+  }
+
   const newBootcamp = await Bootcamp.create(req.body);
   res.status(201).json({ success: true, data: newBootcamp });
 });

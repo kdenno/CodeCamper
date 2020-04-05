@@ -18,12 +18,7 @@ routes.get(
   advancedMiddleware(Bootcamp, "courses"),
   apicontroller.bootcamps
 );
-routes.post(
-  "/",
-  protect,
-  authorize("admin", "publisher"),
-  apicontroller.createbootcamp
-);
+routes.post("/",protect,authorize("admin", "publisher"),apicontroller.createbootcamp);
 routes.get("/:Id", apicontroller.getbootcamp);
 routes.get(
   "/radius/:zipcode/:distance",
