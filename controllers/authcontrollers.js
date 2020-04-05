@@ -91,7 +91,7 @@ exports.ResetPassword = asyncHandler(async (req, res, next) => {
 // @route PUT /api/v1/auth/resetpassword
 // @access Public
 
-exports.UpdatePassword = asyncHandler(async (req, res, next) => {
+exports.updatePassword = asyncHandler(async (req, res, next) => {
   const resetPasswordToken = crypto.createHash('sha256').update(req.params.resettoken).digest('hex');
   const user = User.findOne({resetPasswordToken, resetPasswordExpire: {$gt: Date.now()} });
   if(!user) {

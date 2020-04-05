@@ -5,11 +5,12 @@ const Bootcamproutes = require("./routes/Bootcamp");
 const Courseroutes = require("./routes/Courseroutes");
 const morgan = require("morgan");
 const colors = require("colors");
-const cookieParser = require('cookie-parser');
+const cookieParser = require("cookie-parser");
 const errorHandler = require("./middleware/error");
 const connectDB = require("./config/db");
 const fileupload = require("express-fileupload");
 const authRoutes = require("./routes/Auth");
+const adminRoutes = require("./routes/Users");
 
 // load env variables
 dotenv.config({ path: path.join(__dirname, "config", "config.env") });
@@ -28,6 +29,7 @@ app.use(cookieParser());
 app.use("/api/v1/bootcamps", Bootcamproutes);
 app.use("/api/v1/courses", Courseroutes);
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/users", adminRoutes);
 if (process.env.NODE_ENV === "development") {
   app.use(morgan());
 }
