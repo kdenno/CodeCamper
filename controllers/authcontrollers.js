@@ -2,7 +2,7 @@ const ErrorResponse = require("../util/ErrorMessage");
 const User = require("../models/User");
 const asyncHandler = require("../middleware/asyncHandler");
 const EmailSender = require("../util/sendEmail");
-const crypto = require('crypto');
+const crypto = require("crypto");
 
 // @desc Register user
 // @route POST /api/v1/auth/register
@@ -41,6 +41,19 @@ exports.login = asyncHandler(async (req, res, next) => {
   sendCookie(user, 200, res);
 });
 
+//@desc Logout
+//@route GET /api/v1/auth/logout
+//@access Puglic
+exports.logout = (req, res, next) => {
+  // clear cookie
+  res.cookie("token", "none", {
+    expire: Date(Date.now() + 10 * 1000),
+    httpOnly: false,
+  });
+
+  res.status(200).json({ success: true, data: {} });
+};
+
 // @desc Get logged in user
 // @route GET /api/v1/auth/me
 // @access Private
@@ -71,20 +84,17 @@ exports.ResetPassword = asyncHandler(async (req, res, next) => {
   try {
     await EmailSender({
       email: user.email,
-      subject: 'Password Reset Token',
-      message
+      subject: "Password Reset Token",
+      message,
     });
-    res.status(200).json({ success: true, data: 'Email sent' });
+    res.status(200).json({ success: true, data: "Email sent" });
   } catch (error) {
     console.log(error);
     user.resetPasswordToken = undefined;
     user.resetPasswordExpire = undefined;
-    await user.save({validateBeforeSave: false});
-    return next(new ErrorResponse('Failed to send Email',500));
-    
+    await user.save({ validateBeforeSave: false });
+    return next(new ErrorResponse("Failed to send Email", 500));
   }
-
- 
 });
 
 // @desc Reset user password
@@ -92,19 +102,24 @@ exports.ResetPassword = asyncHandler(async (req, res, next) => {
 // @access Public
 
 exports.updatePassword = asyncHandler(async (req, res, next) => {
-  const resetPasswordToken = crypto.createHash('sha256').update(req.params.resettoken).digest('hex');
-  const user = User.findOne({resetPasswordToken, resetPasswordExpire: {$gt: Date.now()} });
-  if(!user) {
-    return next(new ErrorResponse('Invalid Token',400));
+  const resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(req.params.resettoken)
+    .digest("hex");
+  const user = User.findOne({
+    resetPasswordToken,
+    resetPasswordExpire: { $gt: Date.now() },
+  });
+  if (!user) {
+    return next(new ErrorResponse("Invalid Token", 400));
   }
   // set new password
   user.password = req.body.newpassword;
   user.resetPasswordExpire = undefined;
   user.resetPasswordToken = undefined;
   await user.save();
-sendCookie(user, 200, res)
+  sendCookie(user, 200, res);
 });
-
 
 // @desc update user details
 // @route PUT /api/v1/auth/updatedetails
@@ -113,9 +128,12 @@ sendCookie(user, 200, res)
 exports.updateUserDetails = asyncHandler(async (req, res, next) => {
   const updateFields = {
     name: req.body.name,
-    email: req.body.email
-  }
-  const user = await User.findByIdAndUpdate(req.user.id, updateFields, {new: true, runValidators: true});
+    email: req.body.email,
+  };
+  const user = await User.findByIdAndUpdate(req.user.id, updateFields, {
+    new: true,
+    runValidators: true,
+  });
   res.status(200).json({ success: true, data: user });
 });
 
@@ -124,24 +142,15 @@ exports.updateUserDetails = asyncHandler(async (req, res, next) => {
 // @access Private
 
 exports.changePassword = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user.id).select('+password');
+  const user = await User.findById(req.user.id).select("+password");
   // compare passwords
-  if(! (await user.matchPassword(req.body.currentPassword))) {
-    return next(new ErrorResponse('Password is incorrect', 401));
+  if (!(await user.matchPassword(req.body.currentPassword))) {
+    return next(new ErrorResponse("Password is incorrect", 401));
   }
   user.password = req.body.newPassword;
   await user.save();
   sendCookie(user, 200, res);
 });
-
-
-
-
-
-
-
-
-
 
 // create cookie, send cookie
 const sendCookie = (userObj, statusCode, res) => {
