@@ -11,6 +11,7 @@ const connectDB = require("./config/db");
 const fileupload = require("express-fileupload");
 const authRoutes = require("./routes/Auth");
 const adminRoutes = require("./routes/Users");
+const reveiwsRoutes = require("./routes/Review");
 
 // load env variables
 dotenv.config({ path: path.join(__dirname, "config", "config.env") });
@@ -30,6 +31,7 @@ app.use("/api/v1/bootcamps", Bootcamproutes);
 app.use("/api/v1/courses", Courseroutes);
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", adminRoutes);
+app.use("/api/v1/reviews", reveiwsRoutes);
 if (process.env.NODE_ENV === "development") {
   app.use(morgan());
 }

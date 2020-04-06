@@ -2,6 +2,7 @@ const express = require("express");
 
 // include other resource routers
 const courseRouter = require("./Courseroutes");
+const reviewsRouter = require("./Review");
 const Bootcamp = require("../models/Bootcamp");
 const advancedMiddleware = require("../middleware/advancedMiddleware");
 const { protect, authorize } = require("../middleware/auth");
@@ -10,6 +11,7 @@ const routes = express.Router();
 
 // Re route into other route resources
 routes.use("/:bootcampId/courses", courseRouter); // re route anything that has such a url to courseRouter
+routes.use("/:bootcampId/reviews", reviewsRouter);
 
 const apicontroller = require("../controllers/bootcampcontrollers");
 
