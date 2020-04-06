@@ -4,12 +4,26 @@ const advancedResults = require("../middleware/advancedMiddleware");
 const { protect, authorize } = require("../middleware/auth");
 const Review = require("../models/Reviews");
 
-const { getReviews, getReview, addReview } = require("../controllers/Reviews");
+const {
+  getReviews,
+  getReview,
+  addReview,
+  updateReview,
+  deleteReview,
+} = require("../controllers/Reviews");
 
-router.route("/")
-.get(advancedResults(Review, {path: "bootcamp",select: "name description",}), getReviews)
-.post(protect, authorize('user', 'admin'), addReview);
+router
+  .route("/")
+  .get(
+    advancedResults(Review, { path: "bootcamp", select: "name description" }),
+    getReviews
+  )
+  .post(protect, authorize("user", "admin"), addReview);
 
-router.route("/:Id").get(getReview);
+router
+  .route("/:Id")
+  .get(getReview)
+  .put(protect, authorize("user", "admin"), updateReview)
+  .delete(protect, authorize("user", "admin", deleteReview));
 
 module.exports = router;
