@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "CodeCamper API. REST API that powers the codecamper website",
   "main": "app.js",
+  "engines": {
+    "node": "12.14.0"
+  },
   "scripts": {
     "start": "NODE_ENV=production node app.js",
     "dev": "nodemon app.js"
